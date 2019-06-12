@@ -50,7 +50,8 @@ namespace <%= assemblyName %>.Application.Models.Widgets.<%= widgetName %>
 
         public bool IsEmpty()
         {
-            return string.IsNullOrEmpty(SelectedId) || !Guid.TryParse(SelectedId, out _);
+            return false;
+            //return string.IsNullOrEmpty(SelectedId) || !Guid.TryParse(SelectedId, out _);
         }
     }
 }

@@ -1,4 +1,4 @@
-using <%= assemblyName %>.Application.Controllers.Widgets.<%= widgetName %>;
+using <%= assemblyName %>.Application.Controllers.<%= widgetName %>;
 using Telerik.Sitefinity.Frontend.Mvc.Models;
 
 namespace <%= assemblyName %>.Application.Models.Widgets.<%= widgetName %>

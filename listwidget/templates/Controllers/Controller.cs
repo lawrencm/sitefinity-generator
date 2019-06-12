@@ -13,7 +13,7 @@ using Telerik.Sitefinity.Web.UI;
 namespace <%= assemblyName %>.Application.Controllers.<%= widgetName %>
 {
     [EnhanceViewEngines]
-    [ControllerToolboxItem(Name = "<%= widgetName %>_MVC", Title = "ToolboxTitle", SectionName = ToolboxesConfig.ContentToolboxSectionName,
+    [ControllerToolboxItem(Name = "<%= widgetName %>_MVC", Title = "<%= widgetName %>", SectionName = ToolboxesConfig.ContentToolboxSectionName,
         CssClass = WidgetIconCssClass)]
     [IndexRenderMode(IndexRenderModes.Normal)]
     public class <%= widgetName %>Controller : CacheDependencyController, ICustomWidgetVisualizationExtended, IPersonalizable
