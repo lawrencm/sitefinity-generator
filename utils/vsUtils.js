@@ -17,12 +17,12 @@ module.exports = class {
     async getProjectFile() {
         console.log("getting project file");
 
-
         return await fs.readFile('./SitefinityWebApp.csproj')
             .then(async (data) => {
                 var parser = new xml2js.Parser();
                 const json = await new Promise((resolve, reject) => {
                     parser.parseString(data, (err, result) => err ? reject(err) : resolve(result));
+                    
                 }).then((result) => {
                     // console.log("here")
                     this.projectFile = result

@@ -5,8 +5,7 @@ var Generator = require('yeoman-generator'),
   SfUtils = require('../utils/sfUtils'),
   _ = require('lodash');
 
-var vsUtils = new VsUtils();
-var sfUtils = new SfUtils();
+
 
 module.exports = class extends Generator {
   // The name `constructor` is important here
@@ -18,86 +17,90 @@ module.exports = class extends Generator {
     super(args, opts);
     // Next, add your custom code
     this.option('babel'); // This method adds support for a `--babel` flag
+    this.vsUtils = new VsUtils();
+    this.sfUtils = new SfUtils(this.config);
   }
 
+  // initializing() {
+  //   this.composeWith(require.resolve('../setup'));
 
-
-
-
-  // async getService(){
-  //   // Make a request for a user with a given ID
-  //   var modules = await sfUtils.getDynamicModules();
-  //   // console.log(modules);
   // }
-
-
-  _private_getFiles(){
+  /**
+   * list of all the files to copy for this module
+   */
+  _private_getFiles() {
     return [
-      ['Models/Widgets/Model.cs', `Application/Models/Widget/${this.props.name}/${this.props.name}Model.cs`],
-      ['Models/Widgets/ViewModel.cs',`Application/Models/Widget/${this.props.name}/${this.props.name}ViewModel.cs`],
-      ['Models/Interfaces/IModel.cs',`Application/Models/Interfaces/I${this.props.name}Model.cs`],
-      ['Controllers/Controller.cs', `Application/Controllers/${this.props.name}/${this.props.name}Controller.cs`],
-      ['Views/Default.cshtml',`ResourcePackages/${this.props.resourcePackage}/MVC/Views/${this.props.name}/${this.props.name}.Default.cshtml`],
-      ['Views/DesignerView.Simple.cshtml',`ResourcePackages/${this.props.resourcePackage}/MVC/Views/${this.props.name}/DesignerViewSimple.cshtml`],
-      ['Views/DesignerView.Simple.json',`ResourcePackages/${this.props.resourcePackage}/MVC/Views/${this.props.name}/DesignerViewSimple.json`]
-
+      ['Models/Widgets/Model.cs', `Application/Models/Widget/${this.props.widgetName}/${this.props.widgetName}Model.cs`],
+      ['Models/Widgets/ViewModel.cs', `Application/Models/Widget/${this.props.widgetName}/${this.props.widgetName}ViewModel.cs`],
+      ['Models/Interfaces/IModel.cs', `Application/Models/Interfaces/I${this.props.widgetName}Model.cs`],
+      ['Controllers/Controller.cs', `Application/Controllers/${this.props.widgetName}/${this.props.widgetName}Controller.cs`],
+      ['Views/Default.cshtml', `ResourcePackages/${this.props.resourcePackage}/MVC/Views/${this.props.widgetName}/${this.props.widgetName}.Default.cshtml`],
+      ['Views/DesignerView.Simple.cshtml', `ResourcePackages/${this.props.resourcePackage}/MVC/Views/${this.props.widgetName}/DesignerViewSimple.cshtml`],
+      ['Views/DesignerView.Simple.json', `ResourcePackages/${this.props.resourcePackage}/MVC/Views/${this.props.widgetName}/DesignerViewSimple.json`]
     ]
   }
 
+  _private_getToken() {
+    console.log("getting the token");
+  }
+
+
+  /**
+   * get the user account details from config or prompt for new ones
+   */
+
+
+
+
   async prompting() {
-    this.props = await this.prompt([{
+    var creds = this.config.get("promptValues");
+
+    this.props = await this.prompt([
+
+      {
         type: "input",
-        name: "name",
+        name: "widgetName",
         message: "Widget Name",
-        default: this.appname // Default to current folder name
+        store: true,
+        default: _.startCase(this.appname) // Default to current folder name
       },
       {
-        type: 'checkbox',
-        name: 'models',
-        message: 'What models should be generated',
-        choices: await sfUtils.getDynamicModules()
+        type: "input",
+        name: "assemblyName",
+        message: "Assembly name",
+        store: true,
+        when: () => !creds || !creds.assemblyName,
+        default: async () => await this.vsUtils.getAssemblyName()
       },
       {
         type: 'list',
         name: 'resourcePackage',
+        store: true,
         message: 'What resource pAckge should this belong to',
-        choices: await vsUtils.getResourcePackages()
+        choices: await this.vsUtils.getResourcePackages(),
+        when: () => !creds || !creds.resourcePackage
+
       }
-    ]);
+    ])
 
-    //force string case
-    this.props.name = _.startCase(this.props.name)
+    
 
-    // this.log("app name", this.props.name);
-
-    this.props["assemblyName"] = await vsUtils.getAssemblyName();
 
   }
 
-
-  getDymanicModelSchema(){
-    this.log("TODO - use the sf api to generate the View Model");
-
-    this.props.models.forEach(models => {
-      models.forEach(model => {
-        console.log(`\n\nCreate a view model for ${model.$.Name}`)
-        model.Property.forEach(property => {
-          console.log(`\tCreate the field ${property.$.Name} of type ${property.$.Type}`)
-        });
-      });
-    });
-  }
-
-  generateTests(){
+  generateTests() {
     this.log("TODO - Generate some tests");
   }
 
-  writingFiles() {
-    
+  writing() {
+
+    var prompts = this.config.get("promptValues");
+
     var data = {
-      assemblyName: `${this.props.assemblyName}`,
-      widgetName: `${this.props.name}`
+        assemblyName: `${prompts.assemblyName}`,
+        widgetName: `${prompts.widgetName}`,
     }
+
 
 
     this._private_getFiles().forEach(fileConf => {
@@ -107,6 +110,7 @@ module.exports = class extends Generator {
         data
       );
     });
-  }
 
+
+  }
 };
