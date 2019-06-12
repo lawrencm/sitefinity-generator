@@ -70,7 +70,7 @@ module.exports = class extends Generator {
         message: "Assembly name",
         store: true,
         when: () => !creds || !creds.assemblyName,
-        default: async () => await this.vsUtils.getAssemblyName()
+        default: "SitefinityStarterProject.Website"
       },
       {
         type: 'list',
