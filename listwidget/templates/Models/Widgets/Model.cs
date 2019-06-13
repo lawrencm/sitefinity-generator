@@ -29,6 +29,11 @@ namespace <%= assemblyName %>.Application.Models.Widgets.<%= widgetName %>
         public string SelectedId { get; set; }
 
         /// <inheritdoc />
+        // TODO link to specific type
+        public string ItemType { get; set; } = "Telerik.Sitefinity.DynamicTypes.Model.Slider.Slider";
+
+
+        /// <inheritdoc />
         public virtual <%= widgetName %>ViewModel GetViewModel()
         {
             if (IsEmpty())
@@ -37,8 +42,11 @@ namespace <%= assemblyName %>.Application.Models.Widgets.<%= widgetName %>
             var viewModel = new <%= widgetName %>ViewModel()
             {
                 CssClass = this.CssClass,
-                ShowHeading = this.ShowHeading
-            };            
+                ShowHeading = this.ShowHeading,
+                Heading = this.OverrideHeading,
+                ItemId = this.SelectedId,
+
+            };           
 
 			//TODO put in any extra model to view model binding
 			//viewModel.OverrideHeading = "etc"

@@ -1,1 +1,8 @@
 @model  <%= assemblyName %>.Application.Models.Widgets.<%= widgetName %>.<%= widgetName %>ViewModel
+
+@if (@Model.ShowHeading)
+{
+
+    <h2>@Model.Heading</h2>
+
+}

@@ -4,26 +4,33 @@
 </auto-generated>
 ------------------------------------------------------------------------------ */
 
+angular.module('designer').requires.push('sfSelectors');
+
 angular.module('designer')
     .controller('SimpleCtrl', ['$scope', 'propertyService', function ($scope, propertyService) {
         $scope.feedback.showLoadingIndicator = true;
 
-
-        console.log($scope);
-
         // Get widget properies and load them in the controller's scope
 
+        $scope.$watch(
+            'selectedItem',
+            function (newVal, oldVal) {
+                if (!!newVal && newVal !== oldVal) {
+                    $scope.properties.SelectedItem.PropertyValue = JSON.stringify(newVal);
+                }
+            },
+            true
+        );
 
-        $scope.$watch('properties.Message.PropertyValue', function (newValue, oldValue) {
-            console.log("message");
-
-            console.log(newValue, oldValue);
-
-            if (newValue) {
-                $scope.properties.Message456778668kjhk.PropertyValue = newValue;
-            }
-        });
-
+        $scope.$watch(
+            'selectedId',
+            function (newVal, oldVal) {
+                if (!!newVal && newVal !== oldVal) {
+                    $scope.properties.SelectedId.PropertyValue = newVal;
+                }
+            },
+            true
+        );
 
 
         propertyService.get()
@@ -33,7 +40,16 @@ angular.module('designer')
                 if (data) {
                     $scope.properties = propertyService.toAssociativeArray(data.Items);
 
+                    if (data) {
+                        $scope.properties = propertyService.toAssociativeArray(data.Items);
+                        var serializedSelectedItem = $scope.properties.SelectedItem.PropertyValue;
+                        if (serializedSelectedItem != "")
+                            $scope.selectedItem = JSON.parse(serializedSelectedItem);
 
+                        var serializedSelectedId = $scope.properties.SelectedId.PropertyValue;
+                        if (serializedSelectedId != "")
+                            $scope.selectedId = serializedSelectedId;
+                    }
                 }
             }, function (data) {
                 $scope.feedback.showError = true;

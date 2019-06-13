@@ -11,5 +11,8 @@ namespace <%= assemblyName %>.Application.Models.Widgets.<%= widgetName %>
         public bool ShowHeading { get; set; }
 
         public string Heading { get; set; }
+
+        public string ItemId { get; set; }
+
     }
 }

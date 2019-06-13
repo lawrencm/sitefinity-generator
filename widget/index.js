@@ -23,6 +23,13 @@ module.exports = class extends Generator {
             name: 'widgettype',
             message: 'What kind of widget',
             choices: ["list", "navigation"]
+        },
+        {
+            type: 'confirm',
+            name: 'updateProject',
+            store:true,
+            message: 'Update the project file',
+            default: true
         }])
 
         switch (this.props.widgettype) {

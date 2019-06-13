@@ -131,6 +131,11 @@ module.exports = class extends Generator {
     console.log(prjContentStrings)
 
 
+    if(prompts.updateProject){
+
+    
+
+
     //update the dependency injection file
     //var path = "/path/to/file.html",
     getYoRcPath.dir().then((yoRcDir) => {
@@ -185,6 +190,7 @@ module.exports = class extends Generator {
           return newContent;
         }
       });
+   
 
 
 
@@ -192,6 +198,6 @@ module.exports = class extends Generator {
 
     });
 
-
+  }
   }
 };

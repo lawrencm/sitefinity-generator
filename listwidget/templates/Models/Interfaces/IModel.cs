@@ -35,6 +35,11 @@ namespace <%= assemblyName %>.Application.Models.Interfaces
         string SelectedId { get; set; }
 
         /// <summary>
+        /// Gets or sets the ItemType used for the selector
+        /// </summary>
+        string ItemType { get; }
+
+        /// <summary>
         /// Gets the view model.
         /// </summary>
         /// <returns></returns>
