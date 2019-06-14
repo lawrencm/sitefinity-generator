@@ -30,6 +30,13 @@ module.exports = class extends Generator {
             store:true,
             message: 'Update the project file',
             default: true
+        },
+        {
+            type: 'confirm',
+            name: 'createViewModels',
+            store:true,
+            message: 'Wouuld you like to generate view models for content types',
+            default: false
         }])
 
         switch (this.props.widgettype) {
@@ -44,7 +51,11 @@ module.exports = class extends Generator {
 
 
     writing(){
-        this.composeWith(require.resolve('../contentviewmodels'));
+
+        
+        if(this.props.createViewModels) {
+            this.composeWith(require.resolve('../contentviewmodels'));
+        } 
     }
 
 }

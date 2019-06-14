@@ -30,7 +30,7 @@ namespace <%= assemblyName %>.Application.Models.Widgets.<%= widgetName %>
 
         /// <inheritdoc />
         // TODO link to specific type
-        public string ItemType { get; set; } = "Telerik.Sitefinity.DynamicTypes.Model.Slider.Slider";
+        public string ItemType { get; set; } = "<%= itemType %>";
 
 
         /// <inheritdoc />

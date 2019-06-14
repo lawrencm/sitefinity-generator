@@ -3,6 +3,7 @@ var Generator = require('yeoman-generator'),
   xml2js = require('xml2js'),
   VsUtils = require('../utils/vsUtils'),
   SfUtils = require('../utils/sfUtils'),
+  inquirer = require('inquirer'),
   getYoRcPath = require('get-yo-rc-path'),
   _ = require('lodash');
 
@@ -77,7 +78,32 @@ module.exports = class extends Generator {
         when: () => !creds || !creds.assemblyName,
         default: "SitefinityStarterProject.Website"
       },
+
       {
+        type: 'list',
+        name: 'itemtypeModule',
+        message: 'What module is the item type from',
+        choices: await this.sfUtils.getDynamicModules(),
+      },
+      {
+        type: 'list',
+        name: 'itemType',
+        message: 'What contenttypes',
+        choices: (obj) => {
+          var dynamicModels = [];
+          obj.itemtypeModule.models.forEach(model => {
+            var newModel = {};
+            console.log(model)
+            newModel["name"] = model.$.Name;
+            newModel["value"] = `${obj.itemtypeModule.name}.${model.$.Name}`;
+            newModel["checked"] = false;
+            dynamicModels.push(newModel);
+          });
+
+          return dynamicModels;
+        },
+        store: true
+      }, {
         type: 'list',
         name: 'resourcePackage',
         store: true,
@@ -100,9 +126,12 @@ module.exports = class extends Generator {
 
     var prompts = this.config.get("promptValues");
 
+    // console.log(this.props)
+
     var data = {
       assemblyName: `${prompts.assemblyName}`,
       widgetName: `${prompts.widgetName}`,
+      itemType: `${prompts.itemType}`
     }
 
 
@@ -118,7 +147,7 @@ module.exports = class extends Generator {
       );
 
       //append to prjString
-      console.log(fileConf[2])
+      // console.log(fileConf[2])
       if (fileConf[2] == "Compile") {
         prjCompileStrings.push(`<Compile Include="${fileConf[1].replace(/\//g, "\\")}" />`)
       } else if (fileConf[2] == "Content") {
@@ -127,43 +156,43 @@ module.exports = class extends Generator {
 
     });
 
-    console.log(prjCompileStrings)
-    console.log(prjContentStrings)
+    // console.log(prjCompileStrings)
+    // console.log(prjContentStrings)
 
 
-    if(prompts.updateProject){
-
-    
+    if (prompts.updateProject) {
 
 
-    //update the dependency injection file
-    //var path = "/path/to/file.html",
-    getYoRcPath.dir().then((yoRcDir) => {
 
-      //append to the Denpendency INjector
-      var diPath = `${yoRcDir}\\Application\\DI\\Modules\\ModelsModule.cs`
-      this.fs.copy(diPath, diPath, {
-        process: (content) => {
-          var newString = `
+
+      //update the dependency injection file
+      //var path = "/path/to/file.html",
+      getYoRcPath.dir().then((yoRcDir) => {
+
+        //append to the Denpendency INjector
+        var diPath = `${yoRcDir}\\Application\\DI\\Modules\\ModelsModule.cs`
+        this.fs.copy(diPath, diPath, {
+          process: (content) => {
+            var newString = `
           
             Bind<I${data.widgetName}Model>().To<${data.widgetName}Model>();
 
             //yeoman insert above
 
           `;
-          var regEx = new RegExp('//yeoman insert above', 'g');
-          var newContent = content.toString().replace(regEx, newString);
-          return newContent;
-        }
-      });
+            var regEx = new RegExp('//yeoman insert above', 'g');
+            var newContent = content.toString().replace(regEx, newString);
+            return newContent;
+          }
+        });
 
 
-      // include files in project file
-      var prjPath = `${yoRcDir}\\SitefinityStarterProject.Website.csproj`
-      this.fs.copy(prjPath, prjPath, {
-        process: (content) => {
+        // include files in project file
+        var prjPath = `${yoRcDir}\\SitefinityStarterProject.Website.csproj`
+        this.fs.copy(prjPath, prjPath, {
+          process: (content) => {
 
-          var newCompileString = `
+            var newCompileString = `
           
           <!-- start of ${data.widgetName} compile includes -->
           ${prjCompileStrings.join('\n')}
@@ -173,7 +202,7 @@ module.exports = class extends Generator {
           `
 
 
-          var newContentString = `
+            var newContentString = `
           
           <!-- start of ${data.widgetName} content includes -->
           ${prjContentStrings.join('\n')}
@@ -183,21 +212,23 @@ module.exports = class extends Generator {
           `
 
 
-          var cplRegEx = new RegExp('<!-- END YEOMAN COMPILE INCLUDES -->', 'g');
-          var cntRegEx = new RegExp('<!-- END YEOMAN CONTENT INCLUDES -->', 'g');
+            var cplRegEx = new RegExp('<!-- END YEOMAN COMPILE INCLUDES -->', 'g');
+            var cntRegEx = new RegExp('<!-- END YEOMAN CONTENT INCLUDES -->', 'g');
 
-          var newContent = content.toString().replace(cplRegEx, newCompileString).replace(cntRegEx, newContentString);;
-          return newContent;
-        }
+            var newContent = content.toString().replace(cplRegEx, newCompileString).replace(cntRegEx, newContentString);;
+            return newContent;
+          }
+        });
+
+
+
+
+
+
       });
-   
 
+    }
+    return
 
-
-
-
-    });
-
-  }
   }
 };

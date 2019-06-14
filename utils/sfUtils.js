@@ -62,9 +62,11 @@ module.exports = class {
                 
                 var newModule = {};
                 newModule["name"] = module["$"].Namespace;
-                newModule["value"] = module.EntityType;
+                newModule["value"] = {name:module["$"].Namespace,models:module.EntityType};
                 newModule["checked"] = false;
+                // console.log(newModule)
                 dynamicModules.push(newModule);
+
             }
         });
 

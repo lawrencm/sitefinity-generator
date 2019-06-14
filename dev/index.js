@@ -1,5 +1,4 @@
 var Generator = require('yeoman-generator'),
-    inquirer = require('inquirer'),
     SfUtils = require('../utils/sfUtils');
 
 module.exports = class extends Generator {
@@ -26,14 +25,11 @@ module.exports = class extends Generator {
             message: 'What contenttypes',
             choices: (obj) => {
 
-                // console.log(obj.modules);
+                console.log(obj.modules);
                 var dynamicModels = [];
-                console.log(obj.modules)
                 obj.modules.forEach(module => {
-                    // console.log(module);
-                    dynamicModels.push( new inquirer.Separator(` --- ${module.name} ---`));
-                    module.models.forEach(model=>{
-                       
+                    module.forEach(model=>{
+
                         var newModel = {};
                         newModel["name"] = model.$.Name;
                         newModel["value"] = model;
@@ -45,6 +41,19 @@ module.exports = class extends Generator {
                 });
 
                 return dynamicModels;
+
+
+                // x.forEach(mdl => {
+                //     console.log(mdl)
+    
+                //     mdl.value.forEach(t=>{
+                //         console.log("------------------------\n\n\n");
+    
+                //         console.log(t.$.Name);
+                //         console.log("------------------------\n\n\n");
+                //     })
+                    
+                // });
             }
         }])
     
@@ -62,11 +71,11 @@ module.exports = class extends Generator {
         }
 
         //write out the dynamic content view models
-        this.props.models.forEach(model => {
+        this.props.models.forEach(models => {
 
-            console.log(model);
 
-            // models.forEach(model => {
+
+            models.forEach(model => {
                 
                 data.ViewModel = {
                     props: {}
@@ -101,7 +110,7 @@ module.exports = class extends Generator {
                     data
                 )
                 console.log(`\n\nCreate a view model for ${model.$.Name}`)
-            // });
+            });
 
         })
     }
