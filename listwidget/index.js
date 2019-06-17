@@ -123,112 +123,28 @@ module.exports = class extends Generator {
   }
 
   writing() {
-
     var prompts = this.config.get("promptValues");
-
-    // console.log(this.props)
-
     var data = {
       assemblyName: `${prompts.assemblyName}`,
       widgetName: `${prompts.widgetName}`,
       itemType: `${prompts.itemType}`
     }
 
-
-
-    var prjCompileStrings = [];
-    var prjContentStrings = [];
-
+    //write files
     this._private_getFiles().forEach(fileConf => {
+      
       this.fs.copyTpl(
         this.templatePath(fileConf[0]),
         this.destinationPath(fileConf[1]),
         data
       );
 
-      //append to prjString
-      // console.log(fileConf[2])
-      if (fileConf[2] == "Compile") {
-        prjCompileStrings.push(`<Compile Include="${fileConf[1].replace(/\//g, "\\")}" />`)
-      } else if (fileConf[2] == "Content") {
-        prjContentStrings.push(`<Content Include="${fileConf[1].replace(/\//g, "\\")}" />`)
-      }
-
+      this.vsUtils.includeInProject(this.config,fileConf[1].replace(/\//g, "\\"),fileConf[2])
+      //append item to the array
     });
-
-    // console.log(prjCompileStrings)
-    // console.log(prjContentStrings)
-
-
-    if (prompts.updateProject) {
-
-
-
-
-      //update the dependency injection file
-      //var path = "/path/to/file.html",
-      getYoRcPath.dir().then((yoRcDir) => {
-
-        //append to the Denpendency INjector
-        var diPath = `${yoRcDir}\\Application\\DI\\Modules\\ModelsModule.cs`
-        this.fs.copy(diPath, diPath, {
-          process: (content) => {
-            var newString = `
-          
-            Bind<I${data.widgetName}Model>().To<${data.widgetName}Model>();
-
-            //yeoman insert above
-
-          `;
-            var regEx = new RegExp('//yeoman insert above', 'g');
-            var newContent = content.toString().replace(regEx, newString);
-            return newContent;
-          }
-        });
-
-
-        // include files in project file
-        var prjPath = `${yoRcDir}\\SitefinityStarterProject.Website.csproj`
-        this.fs.copy(prjPath, prjPath, {
-          process: (content) => {
-
-            var newCompileString = `
-          
-          <!-- start of ${data.widgetName} compile includes -->
-          ${prjCompileStrings.join('\n')}
-          <!-- end of ${data.widgetName} compile includes -->
-          
-          <!-- END YEOMAN COMPILE INCLUDES -->
-          `
-
-
-            var newContentString = `
-          
-          <!-- start of ${data.widgetName} content includes -->
-          ${prjContentStrings.join('\n')}
-          <!-- end of ${data.widgetName} content includes -->
-          
-          <!-- END YEOMAN CONTENT INCLUDES -->
-          `
-
-
-            var cplRegEx = new RegExp('<!-- END YEOMAN COMPILE INCLUDES -->', 'g');
-            var cntRegEx = new RegExp('<!-- END YEOMAN CONTENT INCLUDES -->', 'g');
-
-            var newContent = content.toString().replace(cplRegEx, newCompileString).replace(cntRegEx, newContentString);;
-            return newContent;
-          }
-        });
-
-
-
-
-
-
-      });
-
-    }
-    return
+   
+    
+    
 
   }
 };

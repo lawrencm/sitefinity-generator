@@ -11,6 +11,26 @@ module.exports = class {
     }
 
 
+    //include files into the project
+    async includeInProject(config,path,includeType) {
+        
+        //get the current project strings from config
+        var prjCompileStrings = config.get("prjCompileStrings");
+        var prjContentStrings = config.get("prjContentStrings");
+
+    
+        if (includeType == "Compile") {
+            prjCompileStrings.push(`<Compile Include="${path.replace(/\//g, "\\")}" />`)
+          } else if (includeType == "Content") {
+            prjContentStrings.push(`<Content Include="${path.replace(/\//g, "\\")}" />`)
+          }
+
+          config.set("prjCompileStrings",prjCompileStrings);
+          config.set("prjContentStrings",prjContentStrings);
+    
+    }
+
+
     /**
      * Gets the cs project file and converts it to a json object
      */

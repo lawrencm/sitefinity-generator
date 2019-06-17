@@ -5,6 +5,8 @@ module.exports = class extends Generator {
     constructor(args, opts) {
         super(args, opts);
         this.option('babel');
+        this.config.set("prjCompileStrings",[])
+        this.config.set("prjContentStrings",[])
     }
 
     /**
@@ -56,6 +58,8 @@ module.exports = class extends Generator {
         if(this.props.createViewModels) {
             this.composeWith(require.resolve('../contentviewmodels'));
         } 
+        this.composeWith(require.resolve('../updateproject'));
+
     }
 
 }

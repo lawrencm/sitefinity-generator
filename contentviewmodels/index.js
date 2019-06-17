@@ -31,9 +31,9 @@ module.exports = class extends Generator {
                 console.log(obj.modules)
                 obj.modules.forEach(module => {
                     // console.log(module);
-                    dynamicModels.push( new inquirer.Separator(` --- ${module.name} ---`));
-                    module.models.forEach(model=>{
-                       
+                    dynamicModels.push(new inquirer.Separator(` --- ${module.name} ---`));
+                    module.models.forEach(model => {
+
                         var newModel = {};
                         newModel["name"] = model.$.Name;
                         newModel["value"] = model;
@@ -47,8 +47,8 @@ module.exports = class extends Generator {
                 return dynamicModels;
             }
         }])
-    
-    
+
+
     }
 
     writing() {
@@ -61,18 +61,31 @@ module.exports = class extends Generator {
             models: {}
         }
 
+
+       
+
         //write out the dynamic content view models
         this.props.models.forEach(model => {
 
             console.log(model);
 
             // models.forEach(model => {
-                
-                data.ViewModel = {
-                    props: {}
-                }
 
-                model.Property.forEach(property => {
+            data.ViewModel = {
+                props: {}
+            }
+
+            model.Property.forEach(property => {
+                var name = property.$.Name;
+                var o = {
+                    "name": name,
+                    "type": property.$.Type,
+                }
+                data.ViewModel["props"][name] = o
+            });
+
+            if ("NavigationProperty" in model) {
+                model.NavigationProperty.forEach(property => {
                     var name = property.$.Name;
                     var o = {
                         "name": name,
@@ -80,27 +93,21 @@ module.exports = class extends Generator {
                     }
                     data.ViewModel["props"][name] = o
                 });
+            }
 
-                if ("NavigationProperty" in model) {
-                    model.NavigationProperty.forEach(property => {
-                        var name = property.$.Name;
-                        var o = {
-                            "name": name,
-                            "type": property.$.Type,
-                        }
-                        data.ViewModel["props"][name] = o
-                    });
-                }
+            console.log(data.ViewModel)
+            data.ModelName = model.$.Name;
 
-                console.log(data.ViewModel)
-                data.ModelName = model.$.Name;
+            this.fs.copyTpl(
+                this.templatePath('Models/Widgets/ContentModel.cs'),
+                this.destinationPath(`Application/Models/Widget/${data.widgetName}/${model.$.Name}ViewModel.cs`),
+                data
+            )
 
-                this.fs.copyTpl(
-                    this.templatePath('Models/Widgets/ContentModel.cs'),
-                    this.destinationPath(`Application/Models/Widget/${data.widgetName}/${model.$.Name}ViewModel.cs`),
-                    data
-                )
-                console.log(`\n\nCreate a view model for ${model.$.Name}`)
+            var filePath = `Application/Models/Widget/${data.widgetName}/${model.$.Name}ViewModel.cs`
+
+            this.vsUtils.includeInProject(this.config,filePath.replace(/\//g, "\\"),"Compile")
+            console.log(`\n\nCreate a view model for ${model.$.Name}`)
             // });
 
         })
