@@ -9,7 +9,7 @@
     "yeoman-generator"
   ],
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "get-yo-rc-path": "^1.0.1",
     "lodash": "^4.17.11",
     "node-async-fs": "^1.0.0",
